@@ -1,17 +1,6 @@
 import { notFound } from "next/navigation";
 
-import type { Character } from "../../../lib/api";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
-
-async function getCharacter(characterId: string): Promise<Character | null> {
-  const response = await fetch(`${API_BASE_URL}/characters/${encodeURIComponent(characterId)}`, {
-    cache: "no-store",
-  });
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Character profile failed: ${response.status}`);
-  return response.json();
-}
+import { getCharacter } from "../../../lib/api";
 
 export default async function CharacterProfile({
   params,
@@ -24,7 +13,7 @@ export default async function CharacterProfile({
 
   const englishName = character.names.find((name) => name.language === "en")?.text ?? character.id;
   const description = character.description.find((item) => item.language === "en")?.text;
-  const relationships = (character as Character & { relationships?: { type: string; target_id: string }[] }).relationships ?? [];
+  const relationships = character.relationships ?? [];
 
   return (
     <main style={{ maxWidth: 760, margin: "48px auto", padding: 24 }}>
