@@ -1,0 +1,58 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Relationship = {
+  id: string;
+  kind: string;
+  names: { language: string; text: string }[];
+  from_character_id: string;
+  to_character_id: string;
+  source_refs: string[];
+};
+
+const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+
+function titleOf(item: Relationship) {
+  return item.names.find((name) => name.language === "en")?.text ?? item.names[0]?.text ?? item.id;
+}
+
+export default function RelationshipsPage() {
+  const [items, setItems] = useState<Relationship[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${apiBase}/relationships`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("load failed");
+        return response.json() as Promise<Relationship[]>;
+      })
+      .then(setItems)
+      .catch((reason: unknown) => {
+        if ((reason as { name?: string }).name !== "AbortError") setError(true);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, []);
+
+  return (
+    <main style={{ maxWidth: 760, margin: "48px auto", padding: 24 }}>
+      <h1>Mahabharata relationships</h1>
+      <p>Explore sourced relationships between characters.</p>
+      {loading && <p role="status">Loading relationships...</p>}
+      {error && <p role="alert">Unable to load relationships.</p>}
+      {!loading && !error && items.map((item) => (
+        <article key={item.id} style={{ borderLeft: "4px solid currentColor", padding: "8px 16px", marginBottom: 20 }}>
+          <h2>{titleOf(item)}</h2>
+          <p><strong>Type:</strong> {item.kind}</p>
+          <p><strong>From:</strong> {item.from_character_id}</p>
+          <p><strong>To:</strong> {item.to_character_id}</p>
+          <p><strong>Source:</strong> {item.source_refs.join(", ")}</p>
+        </article>
+      ))}
+      {!loading && !error && items.length === 0 && <p role="status">No relationships found.</p>}
+    </main>
+  );
+}
