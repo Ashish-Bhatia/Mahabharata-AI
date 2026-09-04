@@ -1,0 +1,1 @@
+export const chronologyApiPath = "/events";
