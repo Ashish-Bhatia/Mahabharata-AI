@@ -1,38 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
- type Name = { language: string; text: string };
- type Character = { id: string; names: Name[]; description: Name[]; source_refs: string[] };
- type Relationship = { id: string; kind: string; from_character_id: string; to_character_id: string; source_refs: string[] };
+type Name = { language: string; text: string };
+type Character = { id: string; names: Name[]; description: Name[]; source_refs: string[] };
+type Relationship = { id: string; kind: string; from_character_id: string; to_character_id: string; source_refs: string[] };
 
 const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+type CharacterPageProps = { params: Promise<{ characterId: string }> };
 
-export default function CharacterPage({ params }: { params: { characterId: string } }) {
+export default function CharacterPage({ params }: CharacterPageProps) {
+  const { characterId } = use(params);
   const [character, setCharacter] = useState<Character | null>(null);
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const id = decodeURIComponent(params.characterId);
+    const id = decodeURIComponent(characterId);
+    const controller = new AbortController();
     Promise.all([
-      fetch(`${apiBase}/characters/${encodeURIComponent(id)}`),
-      fetch(`${apiBase}/relationships?character_id=${encodeURIComponent(id)}`),
+      fetch(`${apiBase}/characters/${encodeURIComponent(id)}`, { signal: controller.signal }),
+      fetch(`${apiBase}/relationships?character_id=${encodeURIComponent(id)}`, { signal: controller.signal }),
     ])
       .then(async ([characterResponse, relationshipResponse]) => {
         if (!characterResponse.ok || !relationshipResponse.ok) throw new Error("load failed");
-        return [
-          await characterResponse.json() as Character,
-          await relationshipResponse.json() as Relationship[],
-        ] as const;
+        return [await characterResponse.json() as Character, await relationshipResponse.json() as Relationship[]] as const;
       })
       .then(([loadedCharacter, loadedRelationships]) => {
         setCharacter(loadedCharacter);
         setRelationships(loadedRelationships);
       })
-      .catch(() => setError(true));
-  }, [params.characterId]);
+      .catch((reason: unknown) => {
+        if ((reason as { name?: string }).name !== "AbortError") setError(true);
+      });
+    return () => controller.abort();
+  }, [characterId]);
 
   if (error) return <main style={{ maxWidth: 760, margin: "48px auto", padding: 24 }}><p role="alert">Unable to load this character.</p><Link href="/characters">Back to characters</Link></main>;
   if (!character) return <main style={{ maxWidth: 760, margin: "48px auto", padding: 24 }}><p role="status">Loading character...</p></main>;
