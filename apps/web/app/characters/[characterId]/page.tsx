@@ -8,7 +8,13 @@ type Character = { id: string; names: Name[]; description: Name[]; source_refs: 
 type Relationship = { id: string; kind: string; from_character_id: string; to_character_id: string; source_refs: string[] };
 
 const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+const staticCharacterIds = ["arjuna", "krishna"];
+
 type CharacterPageProps = { params: Promise<{ characterId: string }> };
+
+export function generateStaticParams() {
+  return staticCharacterIds.map((characterId) => ({ characterId }));
+}
 
 export default function CharacterPage({ params }: CharacterPageProps) {
   const { characterId } = use(params);
