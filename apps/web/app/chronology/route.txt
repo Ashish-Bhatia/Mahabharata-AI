@@ -1,0 +1,1 @@
+Chronology is a page route, not an API route.
