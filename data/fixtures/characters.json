@@ -1,0 +1,28 @@
+[
+  {
+    "id": "character:krishna",
+    "names": [
+      {"language": "sa", "text": "कृष्ण"},
+      {"language": "hi", "text": "कृष्ण"},
+      {"language": "en", "text": "Krishna"},
+      {"language": "en-Latn", "text": "Krishna"}
+    ],
+    "description": [
+      {"language": "en", "text": "A central figure in the Mahabharata and an ally and guide of the Pandavas."}
+    ],
+    "source_refs": ["source:mahabharata-primary"]
+  },
+  {
+    "id": "character:arjuna",
+    "names": [
+      {"language": "sa", "text": "अर्जुन"},
+      {"language": "hi", "text": "अर्जुन"},
+      {"language": "en", "text": "Arjuna"},
+      {"language": "en-Latn", "text": "Arjuna"}
+    ],
+    "description": [
+      {"language": "en", "text": "One of the Pandava brothers and a principal warrior in the Mahabharata."}
+    ],
+    "source_refs": ["source:mahabharata-primary"]
+  }
+]
