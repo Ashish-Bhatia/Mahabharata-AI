@@ -21,8 +21,12 @@ def test_get_character() -> None:
     response = client.get("/characters/character:krishna")
     assert response.status_code == 200
     assert response.json()["source_refs"] == ["source:mahabharata-primary"]
+    assert response.json()["relationships"] == [
+        {"type": "ally", "target_id": "character:arjuna"}
+    ]
 
 
 def test_missing_character() -> None:
     response = client.get("/characters/character:unknown")
     assert response.status_code == 404
+    assert response.json()["detail"] == "Character not found"
