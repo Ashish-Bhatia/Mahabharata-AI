@@ -10,6 +10,9 @@
     "description": [
       {"language": "en", "text": "A central figure in the Mahabharata and an ally and guide of the Pandavas."}
     ],
+    "relationships": [
+      {"type": "ally", "target_id": "character:arjuna"}
+    ],
     "source_refs": ["source:mahabharata-primary"]
   },
   {
@@ -22,6 +25,9 @@
     ],
     "description": [
       {"language": "en", "text": "One of the Pandava brothers and a principal warrior in the Mahabharata."}
+    ],
+    "relationships": [
+      {"type": "ally", "target_id": "character:krishna"}
     ],
     "source_refs": ["source:mahabharata-primary"]
   }
