@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 type Name = { language: string; text: string };
 type Character = {
@@ -10,38 +11,40 @@ type Character = {
   source_refs: string[];
 };
 
-const characters: Character[] = [
-  {
-    id: "character:krishna",
-    names: [
-      { language: "sa", text: "कृष्ण" },
-      { language: "hi", text: "कृष्ण" },
-      { language: "en", text: "Krishna" },
-    ],
-    description: [{ language: "en", text: "A central figure in the Mahabharata and an ally and guide of the Pandavas." }],
-    source_refs: ["source:mahabharata-primary"],
-  },
-  {
-    id: "character:arjuna",
-    names: [
-      { language: "sa", text: "अर्जुन" },
-      { language: "hi", text: "अर्जुन" },
-      { language: "en", text: "Arjuna" },
-    ],
-    description: [{ language: "en", text: "One of the Pandava brothers and a principal warrior in the Mahabharata." }],
-    source_refs: ["source:mahabharata-primary"],
-  },
-];
+const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+
+function title(character: Character) {
+  return character.names.find((name) => name.language === "en")?.text ?? character.names[0]?.text ?? character.id;
+}
 
 export default function Home() {
   const [query, setQuery] = useState("");
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${apiBase}/characters`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("load failed");
+        return response.json() as Promise<Character[]>;
+      })
+      .then(setCharacters)
+      .catch((reason: unknown) => {
+        if ((reason as { name?: string }).name !== "AbortError") setError(true);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, []);
+
   const results = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
     if (!needle) return characters;
     return characters.filter((character) =>
       character.names.some((name) => name.text.toLocaleLowerCase().includes(needle)),
     );
-  }, [query]);
+  }, [characters, query]);
 
   return (
     <main style={{ maxWidth: 760, margin: "48px auto", padding: 24 }}>
@@ -55,17 +58,21 @@ export default function Home() {
         placeholder="Krishna or कृष्ण"
         style={{ display: "block", width: "100%", padding: 12, margin: "8px 0 24px" }}
       />
-      <section aria-label="Character results">
-        {results.map((character) => (
-          <article key={character.id} style={{ border: "1px solid #ccc", padding: 16, marginBottom: 12 }}>
-            <h2>{character.names.find((name) => name.language === "en")?.text}</h2>
-            <p>{character.description.find((item) => item.language === "en")?.text}</p>
-            <p><strong>Names:</strong> {character.names.map((name) => name.text).join(" · ")}</p>
-            <p><strong>Source:</strong> {character.source_refs.join(", ")}</p>
-          </article>
-        ))}
-        {results.length === 0 && <p>No matching character found.</p>}
-      </section>
+      {loading && <p role="status">Loading characters...</p>}
+      {error && <p role="alert">Unable to load the character catalogue.</p>}
+      {!loading && !error && (
+        <section aria-label="Character results">
+          {results.map((character) => (
+            <article key={character.id} style={{ border: "1px solid #ccc", padding: 16, marginBottom: 12 }}>
+              <h2><Link href={`/characters/${encodeURIComponent(character.id)}`}>{title(character)}</Link></h2>
+              <p>{character.description.find((item) => item.language === "en")?.text}</p>
+              <p><strong>Names:</strong> {character.names.map((name) => name.text).join(" · ")}</p>
+              <p><strong>Source:</strong> {character.source_refs.join(", ")}</p>
+            </article>
+          ))}
+          {results.length === 0 && <p role="status">No matching character found.</p>}
+        </section>
+      )}
     </main>
   );
 }
