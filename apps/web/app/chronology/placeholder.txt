@@ -1,0 +1,1 @@
+Frontend vertical slice placeholder removed in favor of the dedicated chronology page.
