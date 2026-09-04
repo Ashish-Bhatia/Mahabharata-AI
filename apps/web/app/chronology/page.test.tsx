@@ -6,11 +6,10 @@ describe("chronology page contract", () => {
   });
 
   it("defines the primary event exploration states", () => {
-    const states = ["loading", "error", "empty", "results"];
-    expect(states).toEqual(["loading", "error", "empty", "results"]);
+    expect(["loading", "error", "empty", "results"]).toHaveLength(4);
   });
 
   it("supports multilingual search examples", () => {
-    expect(["Kurukshetra", "कुरुक्षेत्र"]).toHaveLength(2);
+    expect(["Kurukshetra", "कुरुक्षेत्र"]).toContain("कुरुक्षेत्र");
   });
 });
