@@ -1,0 +1,38 @@
+[
+  {
+    "id": "event:lakshagriha",
+    "sequence": 10,
+    "names": [
+      {"language": "en", "text": "House of Lac"},
+      {"language": "hi", "text": "लाक्षागृह"},
+      {"language": "sa", "text": "लाक्षागृहम्"}
+    ],
+    "description": "The Pandavas escape the house of lac after a plot to burn them alive.",
+    "character_ids": ["character:yudhishthira", "character:bhima", "character:arjuna"],
+    "source_refs": ["source:mahabharata-primary"]
+  },
+  {
+    "id": "event:draupadi-swayamvara",
+    "sequence": 20,
+    "names": [
+      {"language": "en", "text": "Draupadi's Swayamvara"},
+      {"language": "hi", "text": "द्रौपदी स्वयंवर"},
+      {"language": "sa", "text": "द्रौपदीस्वयंवरम्"}
+    ],
+    "description": "Arjuna wins Draupadi at her swayamvara by completing the archery challenge.",
+    "character_ids": ["character:arjuna", "character:draupadi"],
+    "source_refs": ["source:mahabharata-primary"]
+  },
+  {
+    "id": "event:kurukshetra-war",
+    "sequence": 30,
+    "names": [
+      {"language": "en", "text": "Kurukshetra War"},
+      {"language": "hi", "text": "कुरुक्षेत्र युद्ध"},
+      {"language": "sa", "text": "कुरुक्षेत्रयुद्धम्"}
+    ],
+    "description": "The great war between the Pandavas and Kauravas is fought at Kurukshetra.",
+    "character_ids": ["character:arjuna", "character:krishna"],
+    "source_refs": ["source:mahabharata-primary"]
+  }
+]
