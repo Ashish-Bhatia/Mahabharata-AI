@@ -1,46 +1,28 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-type Name = { language: string; text: string };
-type Character = {
-  id: string;
-  names: Name[];
-  description: Name[];
-  source_refs: string[];
-};
-
-const characters: Character[] = [
-  {
-    id: "character:krishna",
-    names: [
-      { language: "sa", text: "कृष्ण" },
-      { language: "hi", text: "कृष्ण" },
-      { language: "en", text: "Krishna" },
-    ],
-    description: [{ language: "en", text: "A central figure in the Mahabharata and an ally and guide of the Pandavas." }],
-    source_refs: ["source:mahabharata-primary"],
-  },
-  {
-    id: "character:arjuna",
-    names: [
-      { language: "sa", text: "अर्जुन" },
-      { language: "hi", text: "अर्जुन" },
-      { language: "en", text: "Arjuna" },
-    ],
-    description: [{ language: "en", text: "One of the Pandava brothers and a principal warrior in the Mahabharata." }],
-    source_refs: ["source:mahabharata-primary"],
-  },
-];
+import { useEffect, useState } from "react";
+import { Character, searchCharacters } from "../lib/api";
 
 export default function Home() {
   const [query, setQuery] = useState("");
-  const results = useMemo(() => {
-    const needle = query.trim().toLocaleLowerCase();
-    if (!needle) return characters;
-    return characters.filter((character) =>
-      character.names.some((name) => name.text.toLocaleLowerCase().includes(needle)),
-    );
+  const [results, setResults] = useState<Character[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        setResults(await searchCharacters(query));
+      } catch {
+        setError("Unable to load characters. Check the API connection and try again.");
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+
+    return () => window.clearTimeout(timer);
   }, [query]);
 
   return (
@@ -53,8 +35,13 @@ export default function Home() {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Krishna or कृष्ण"
+        aria-describedby="search-status"
         style={{ display: "block", width: "100%", padding: 12, margin: "8px 0 24px" }}
       />
+      <p id="search-status" aria-live="polite">
+        {loading ? "Searching..." : `${results.length} character${results.length === 1 ? "" : "s"} found`}
+      </p>
+      {error && <p role="alert">{error}</p>}
       <section aria-label="Character results">
         {results.map((character) => (
           <article key={character.id} style={{ border: "1px solid #ccc", padding: 16, marginBottom: 12 }}>
@@ -64,7 +51,7 @@ export default function Home() {
             <p><strong>Source:</strong> {character.source_refs.join(", ")}</p>
           </article>
         ))}
-        {results.length === 0 && <p>No matching character found.</p>}
+        {!loading && !error && results.length === 0 && <p>No matching character found.</p>}
       </section>
     </main>
   );
