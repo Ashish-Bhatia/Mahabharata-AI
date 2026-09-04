@@ -1,0 +1,5 @@
+[
+  {"id":"relationship:krishna-arjuna","from_character_id":"character:krishna","to_character_id":"character:arjuna","kind":"ally","names":[{"language":"en","text":"Krishna and Arjuna"},{"language":"hi","text":"कृष्ण और अर्जुन"}],"source_refs":["source:mahabharata-primary"]},
+  {"id":"relationship:arjuna-draupadi","from_character_id":"character:arjuna","to_character_id":"character:draupadi","kind":"spouse","names":[{"language":"en","text":"Arjuna and Draupadi"},{"language":"hi","text":"अर्जुन और द्रौपदी"}],"source_refs":["source:mahabharata-primary"]},
+  {"id":"relationship:krishna-pandavas","from_character_id":"character:krishna","to_character_id":"character:pandavas","kind":"ally","names":[{"language":"en","text":"Krishna and the Pandavas"},{"language":"hi","text":"कृष्ण और पाण्डव"}],"source_refs":["source:mahabharata-primary"]}
+]
