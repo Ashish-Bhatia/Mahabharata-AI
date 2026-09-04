@@ -33,5 +33,7 @@ jobs:
           node-version: "22"
       - name: Install web dependencies
         run: npm install
+      - name: Run frontend tests
+        run: npm test -- --run
       - name: Build web application
         run: npm run build
